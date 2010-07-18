@@ -414,6 +414,11 @@ html>body #help-index li a {
 	border-left:10px solid #EBF4FD;
 }
 
+html>body #help-index li.selected {
+	width:auto;
+	margin-left:10px;
+}
+
 #help-index li a:hover {
 	border-left:10px solid #497FC6;
 	background-color:#FFFFFF;
@@ -425,6 +430,9 @@ html>body #help-index li a {
 }
 #help-content > h1 {
 	background:transparent url('../images/icons/help-content.png') no-repeat left top;
+}
+#help-content > p {
+	text-align: left;
 }
 /* ---------- */
 /* help.php */
