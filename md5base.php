@@ -6,15 +6,32 @@ class HelpPage
 	public function __construct()
 	{
 		$this->db = new MD5DB();
-	}	
-	
-	private function getHelpCategories()
-	{
-		
 	}
-	
-	
+	public function getHelpCategories() {
+		$ret=array();
+		$categories=$this->db->query("SELECT * FROM `help-categories` ORDER BY `id` ASC");
+		$i = 0;
+		foreach ($categories as $cat)
+		{
+			$ret[$i]['id'] = $cat['id'];$ret[$i]['name'] = $cat['name'];
+			$i++;
+		}
+		return $ret;	
+	}
+	public function getHelpContents() {
+		if(isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {$id = $_GET['id'];} else {$id = 0;}
+		$ret=array();
+		$categories=$this->db->query("SELECT `help-contents`.*,`help-categories`.name FROM `help-contents` LEFT JOIN `help-categories` ON `help-contents`.category=`help-categories`.id WHERE `help-contents`.category='$id' ORDER BY id ASC");
+		$i = 0;
+		foreach ($categories as $cat)
+		{
+			$ret[$i]['name'] = $cat['name'];$ret[$i]['topic'] = $cat['topic'];$ret[$i]['content'] = $cat['content'];
+			$i++;
+		}
+		return $ret;	
+	}
 }
+
 
 class BrowsePage
 {
@@ -45,10 +62,6 @@ class BrowsePage
 	return $output;
 	}
 	
-	private function getQueryString ($change) {
-		$string = $_SERVER['QUERY_STRING'];
-		return $string;
-	}
 	public function BrowseValues() {
 	$params = $this->cleanGetValues();
 	$result=$this->db->query("SELECT hashes.*, users.name, TIME(hashes.timestamp), DATE(hashes.timestamp) FROM hashes LEFT JOIN users ON hashes.addedby=users.id ORDER BY ".$params['orderby']." ".$params['sortby']." LIMIT ". $params['limit'].",".$params['uplimit']);
