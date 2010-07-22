@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Gostitelj: localhost
--- Čas nastanka: 18 Jul 2010 ob 11:09 AM
+-- Čas nastanka: 22 Jul 2010 ob 02:49 PM
 -- Različica strežnika: 5.1.41
 -- Različica PHP: 5.3.1
 
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `hashes` (
   `comment` varchar(164) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `timestamp` varchar(20) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `addedby` int(11) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `user-settings` (
   `user_id` int(8) NOT NULL,
   `show_email` int(1) NOT NULL,
   `show_profile` int(1) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -81,12 +81,13 @@ CREATE TABLE IF NOT EXISTS `user-settings` (
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(16) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  `password` varchar(32) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `password` varchar(40) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `nhashes` int(11) NOT NULL DEFAULT '0',
   `email` varchar(64) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  `activation` varchar(32) NOT NULL DEFAULT '',
+  `activation` varchar(32) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `temp` varchar(32) CHARACTER SET utf8 NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=12 ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

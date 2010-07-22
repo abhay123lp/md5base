@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 class HelpPage
 {
@@ -122,7 +123,6 @@ class BrowsePage
 	}
 }
 
-
 class LoginPage
 {
 	private $db, $captcha, $message, $errors;
@@ -130,19 +130,40 @@ class LoginPage
 	{
 		$this->db = new MD5DB();
 		$this->captcha = new Captcha();
-		if (isset($_GET['action']) && $_GET['action']=='login')
+		if (isset($_POST['action']) && $_POST['action']=='Login')
 		{
-			
+			if(isset($_POST['user']) && strlen($_POST['user']) > 0 && isset($_POST['pass']) && strlen($_POST['pass']) > 0) {
+				
+				$login=$this->db->query("SELECT users.name,users.id,users.temp FROM users WHERE users.name='".$this->db->clean($_POST['user'])."' AND users.password=SHA1('".$this->db->clean($_POST['pass'])."') AND users.activation=1");
+				if($login) {
+					if(isset($_POST['remember'])) {
+						//autologin
+						$value = $this->db->randomize(time());
+						$remember=$this->db->query("UPDATE users SET users.temp=MD5('$value') WHERE users.name='".$this->db->clean($_POST['user'])."'");
+						setcookie("remember", $value, time()+3600*24*14, "/");
+						if(!$remember) {$message = '<div class="warning"><p>Failed to set autologin!</p></div>';}
+					}
+				$_SESSION['user_name'] = $login[0]['name'];
+				$_SESSION['user_id'] = $login[0]['id'];
+				$message = '<div class="success"><p>Login succesful. <a href="login.php">Click here</a> to reload this page!</p></div> ';
+				}
+				else {
+				$message = '<div class="warning"><p>Failed to log you in. Possible reasons:</p><ul><li>Did you activate your account yet? Click here to resend the activation code.</li><li>Did you spell your username and password correctly?</li><li>Is your Caps Lock on?</li></ul></div> ';
+				}
+			}
+			else {
+				$message = '<div class="warning"><p>Please enter valid data!</p></div> ';
+			}
 		}
-		else if (isset($_GET['action']) && $_GET['action']=='register')
+		else if (isset($_POST['action']) && $_POST['action']=='register')
 		{
 		
 		}
-		else if (isset($_GET['action']) && $_GET['action']=='activate')
+		else if (isset($_POST['action']) && $_POST['action']=='activate')
 		{
 		
 		}
-		
+		$this->message=$message;
 	}
 	public function getMessage() {return $this->message;}
 	public function getErrors() {return $this->errors;}
@@ -285,6 +306,18 @@ class MD5DB
 	public function query($str)
 	{
 		return $this->db->query($str);
+	}
+	public function clean($str) {
+		return mysql_real_escape_string($str);
+	}
+	public function randomize($str) {
+		$str_arr = str_split($str);
+		shuffle($str_arr);
+		$nstr = '';
+		foreach ($str_arr as $char) {
+			$nstr .= $char;
+		}
+		return $nstr;
 	}
 }
 
