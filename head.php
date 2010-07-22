@@ -14,8 +14,9 @@
 	<div id="navdiv">
 		<div id="menu"><a href="submit.php" class="menulink">Submit</a> | 
 		<?php if(isset($_SESSION['user_name']) && strlen($_SESSION['user_name']) > 0 && isset($_SESSION['user_id']) && strlen($_SESSION['user_id']) > 0) { echo '<a href="user.php?id='.$_SESSION['user_id'].'" class="menulink">Settings</a>';} else {echo	'<a href="login.php" class="menulink">Login</a>';} ?>
-
-		| <a href="browse.php" class="menulink">Browse</a> | <a href="help.php" class="menulink">Help</a> | About | <a href="index.php" class="menulink">Home</a></div>
+		| <a href="browse.php" class="menulink">Browse</a> | <a href="help.php" class="menulink">Help</a> | About | <a href="index.php" class="menulink">Home</a>
+		<?php if(isset($_SESSION['user_name']) && strlen($_SESSION['user_name']) > 0 && isset($_SESSION['user_id']) && strlen($_SESSION['user_id']) > 0) { echo '| <a href="Login.php?action=Logout" class="menulink">Logout</a>';} ?>		
+		</div>
 	</div>
 	<div id="srchdiv">
 			<form action="">

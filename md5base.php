@@ -1,5 +1,6 @@
 <?php
 session_start();
+if(isset($_COOKIE['remember'])) {$try = new LoginPage();$try->AutoLogin();}
 
 class HelpPage
 {
@@ -20,16 +21,22 @@ class HelpPage
 		return $ret;	
 	}
 	public function getHelpContents() {
-		if(isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {$id = $_GET['id'];} else {$id = 0;}
+		if(isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {$id = $this->db->clean($_GET['id']);} else {$id = 0;}
 		$ret=array();
 		$categories=$this->db->query("SELECT `help-contents`.*,`help-categories`.name FROM `help-contents` LEFT JOIN `help-categories` ON `help-contents`.category=`help-categories`.id WHERE `help-contents`.category='$id' ORDER BY id ASC");
 		$i = 0;
+		if($categories) {
 		foreach ($categories as $cat)
 		{
 			$ret[$i]['name'] = $cat['name'];$ret[$i]['topic'] = $cat['topic'];$ret[$i]['content'] = $cat['content'];
 			$i++;
 		}
-		return $ret;	
+		return $ret;
+		}
+		else {
+			$ret[0]['name'] = "Help content not found";$ret[0]['topic'] = "Error: Content not found";$ret[$i]['content'] = "Make sure you selected the correct topic and try again!";
+			return $ret;
+		}
 	}
 }
 
@@ -140,8 +147,8 @@ class LoginPage
 						//autologin
 						$value = $this->db->randomize(time());
 						$remember=$this->db->query("UPDATE users SET users.temp=MD5('$value') WHERE users.name='".$this->db->clean($_POST['user'])."'");
-						setcookie("remember", $value, time()+3600*24*14, "/");
-						if(!$remember) {$message = '<div class="warning"><p>Failed to set autologin!</p></div>';}
+						setcookie("remember", md5($value), time()+3600*24*14, "/");
+						if(!$remember) {$message = '<div class="warning"><p>Failed to set AutoLogin!</p></div>';}
 					}
 				$_SESSION['user_name'] = $login[0]['name'];
 				$_SESSION['user_id'] = $login[0]['id'];
@@ -154,7 +161,7 @@ class LoginPage
 			else {
 				$message = '<div class="warning"><p>Please enter valid data!</p></div> ';
 			}
-		}
+		}		
 		else if (isset($_POST['action']) && $_POST['action']=='register')
 		{
 		
@@ -163,11 +170,24 @@ class LoginPage
 		{
 		
 		}
+		else if (isset($_GET['action']) && $_GET['action']=='Logout')	{
+		$this->LogOut();
+		$message = '<div class="success"><p>You have been successfuly logged out!</p></div>'; 
+		}
 		$this->message=$message;
 	}
 	public function getMessage() {return $this->message;}
 	public function getErrors() {return $this->errors;}
 	public function getCaptcha() {return $this->captcha->getCaptcha();}
+	public function AutoLogin() {
+		$login = $this->db->query("SELECT users.name,users.id FROM users WHERE users.temp='".$this->db->clean($_COOKIE['remember'])."'");
+		if($login) {$_SESSION['user_name'] = $login[0]['name'];$_SESSION['user_id'] = $login[0]['id'];}
+	return "SELECT users.name,users.id FROM users WHERE temp='".$this->db->clean($_COOKIE['remember'])."'";
+	}
+	public function LogOut() {
+	if(isset($_COOKIE['remember'])) {setcookie("remember","",time()-3600,"/");}
+	unset($_SESSION['user_name']);unset($_SESSION['user_id']);
+	}
 }
 
 require_once('recaptchalib.php');
