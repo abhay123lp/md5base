@@ -141,13 +141,13 @@ class LoginPage
 		{
 			if(isset($_POST['user']) && strlen($_POST['user']) > 0 && isset($_POST['pass']) && strlen($_POST['pass']) > 0) {
 				
-				$login=$this->db->query("SELECT users.name,users.id,users.temp FROM users WHERE users.name='".$this->db->clean($_POST['user'])."' AND users.password=SHA1('".$this->db->clean($_POST['pass'])."') AND users.activation=1");
+				$login=$this->db->query("SELECT users.name,users.id,users.temp FROM users WHERE users.name='".$this->db->clean($_POST['user'])."' AND users.password=SHA1('".$this->db->clean($_POST['pass'])."') AND users.activation=1") or die(mysql_error());
 				if($login) {
 					if(isset($_POST['remember'])) {
 						//autologin
 						$value = $this->db->randomize(time());
-						$remember=$this->db->query("UPDATE users SET users.temp=MD5('$value') WHERE users.name='".$this->db->clean($_POST['user'])."'");
-						setcookie("remember", md5($value), time()+3600*24*14, "/");
+						$remember=$this->db->query("UPDATE users SET users.temp=MD5('$value') WHERE users.id='".$login[0]['id']."'");
+						setcookie("remember", $login[0]['id'].";".md5($value), time()+3600*24*14, "/");
 						if(!$remember) {$message = '<div class="warning"><p>Failed to set AutoLogin!</p></div>';}
 					}
 				$_SESSION['user_name'] = $login[0]['name'];
@@ -180,9 +180,9 @@ class LoginPage
 	public function getErrors() {return $this->errors;}
 	public function getCaptcha() {return $this->captcha->getCaptcha();}
 	public function AutoLogin() {
-		$login = $this->db->query("SELECT users.name,users.id FROM users WHERE users.temp='".$this->db->clean($_COOKIE['remember'])."'");
+		$cookie = explode(';',$this->db->clean($_COOKIE['remember']));
+		$login = $this->db->query("SELECT users.name,users.id FROM users WHERE users.id='".$cookie[0]."' AND users.temp='".$cookie[1]."'");
 		if($login) {$_SESSION['user_name'] = $login[0]['name'];$_SESSION['user_id'] = $login[0]['id'];}
-	return "SELECT users.name,users.id FROM users WHERE temp='".$this->db->clean($_COOKIE['remember'])."'";
 	}
 	public function LogOut() {
 	if(isset($_COOKIE['remember'])) {setcookie("remember","",time()-3600,"/");}
