@@ -1,0 +1,1 @@
+Online database of user contributed md5 file hashes. You can be registered to submit your hashes or anonymous. Benefits of registering are: use of multi-submit, use of programs to submit, chance of being on a Hall of Fame list and more. This project uses icons from the Everaldo: Crystal icon set: http://everaldo.com/crystal/
